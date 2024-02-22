@@ -43,9 +43,13 @@ class ReflexAgent(Agent):
 
         # Choose one of the best actions
         scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
+        # apply the evaluation function on each legalMove and choose the action with the best score.
+        # action variable a parameter for legalMoves to be passed to the function
         bestScore = max(scores)
         bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
+        # save the index with the best score
         chosenIndex = random.choice(bestIndices) # Pick randomly among the best
+        # If there are multiple moves with the same best score, randomly pick
 
         "Add more of your code here if you want to"
 
@@ -66,6 +70,8 @@ class ReflexAgent(Agent):
         Print out these variables to see what you're getting, then combine them
         to create a masterful evaluation function.
         """
+        # In order to improve the reflex agent, I need to improve the evaluation function
+        # using the food location / ghost location
         # Useful information you can extract from a GameState (pacman.py)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
         newPos = successorGameState.getPacmanPosition()
