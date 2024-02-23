@@ -141,7 +141,66 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        def maximizer(state, agentIndex, depth):
+            value = -float('inf')
+            chosenAction = None
+            possibleActions = state.getLegalActions(agentIndex)
+
+            # If I am at the last agent (opponent) next agent should be
+            # my minimax agent
+            nextAgent = agentIndex + 1
+            if state.getNumAgents() - 1 == agentIndex:
+                nextAgent = 0
+
+            for action in possibleActions:
+                nextState = state.generateSuccessor(agentIndex, action)
+                result = miniMax(nextState, nextAgent, depth + 1, action)
+                if value < result[0]:
+                    value = result[0]
+                    # Replace the return value: chosenAction that was chosen
+                    chosenAction = action
+            return [value, chosenAction]
+
+        def minimizer(state, agentIndex, depth):
+            value = float('inf')
+            chosenAction = None
+
+            nextAgent = agentIndex + 1
+            if state.getNumAgents() - 1 == agentIndex:
+                nextAgent = 0
+
+            possibleActions = state.getLegalActions(agentIndex)
+            for action in possibleActions:
+                nextState = state.generateSuccessor(agentIndex, action)
+                result = miniMax(nextState, nextAgent, depth + 1, action)
+                if value > result[0]:
+                    value = result[0]
+                    chosenAction = action
+            return [value, chosenAction]
+
+        def miniMax(state, agentIndex, currentDepth, action):
+
+            # base case 1: Reached depth
+            # Few ways to conclude full depth. One way is # of agent * self.depth
+            # Keep track of the depth every recursive call
+            if state.getNumAgents() * self.depth <= currentDepth:
+                # Return as a list of value and action that was previously passed
+                # This seems unnecessary as we only need the action for the root (maximizer)
+                # at layer 1. I can't think of a more efficient method right now
+                # Stick it with passing it every recursive return
+                return [self.evaluationFunction(state), action]
+
+            # base case 2: Terminal state
+            if state.isWin() or state.isLose():
+                return [self.evaluationFunction(state), action]
+            if agentIndex == 0:
+                return maximizer(state, agentIndex, currentDepth)
+            elif agentIndex > 0:
+                return minimizer(state, agentIndex, currentDepth)
+
+        # return: [value, chosenAction]
+        return miniMax(gameState, 0, 0, None)[1]
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
