@@ -309,7 +309,82 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        def maximizer(state, agentIndex, depth, alpha, beta):
+            value = -float('inf')
+            chosenAction = None
+            possibleActions = state.getLegalActions(agentIndex)
+
+            # If I am at the last agent (opponent) next agent should be
+            # my minimax agent
+            nextAgent = agentIndex + 1
+            if state.getNumAgents() - 1 == agentIndex:
+                nextAgent = 0
+
+            for action in possibleActions:
+                nextState = state.generateSuccessor(agentIndex, action)
+                result = miniMax(nextState, nextAgent, depth + 1, action, alpha, beta)
+
+                # Update value
+                if value < result[0]:
+                    value = result[0]
+                    # Replace the return value: chosenAction that was chosen
+                    chosenAction = action
+
+                # prune
+                if value > beta:
+                    print("prune")
+                    return [value, chosenAction]
+                alpha = max(alpha, value)
+
+            return [value, chosenAction]
+
+        def minimizer(state, agentIndex, depth, alpha, beta):
+            value = float('inf')
+            chosenAction = None
+
+            nextAgent = agentIndex + 1
+            if state.getNumAgents() - 1 == agentIndex:
+                nextAgent = 0
+
+            possibleActions = state.getLegalActions(agentIndex)
+            for action in possibleActions:
+                nextState = state.generateSuccessor(agentIndex, action)
+                result = miniMax(nextState, nextAgent, depth + 1, action, alpha, beta)
+                if value > result[0]:
+                    value = result[0]
+                    chosenAction = action
+
+                if value < alpha:
+                    print("prune")
+                    return [value, chosenAction]
+
+                beta = min(beta, value)
+                print("beta", beta)
+
+            return [value, chosenAction]
+
+        def miniMax(state, agentIndex, currentDepth, action, alpha, beta):
+
+            # base case 1: Reached depth
+            # Few ways to conclude full depth. One way is # of agent * self.depth
+            # Keep track of the depth every recursive call
+            if state.getNumAgents() * self.depth <= currentDepth:
+                # Return as a list of value and action that was previously passed
+                # This seems unnecessary as we only need the action for the root (maximizer)
+                # at layer 1. I can't think of a more efficient method right now
+                # Stick it with passing it every recursive return
+                return [self.evaluationFunction(state), action]
+
+            # base case 2: Terminal state
+            if state.isWin() or state.isLose():
+                return [self.evaluationFunction(state), action]
+            if agentIndex == 0:
+                return maximizer(state, agentIndex, currentDepth, alpha, beta)
+            elif agentIndex > 0:
+                return minimizer(state, agentIndex, currentDepth, alpha, beta)
+
+        # return: [value, chosenAction]
+        return miniMax(gameState, 0, 0, None, -float('inf'), float('inf'))[1]
 
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
