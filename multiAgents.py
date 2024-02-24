@@ -332,7 +332,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
                 # prune
                 if value > beta:
-                    print("prune")
                     return [value, chosenAction]
                 alpha = max(alpha, value)
 
@@ -355,11 +354,9 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                     chosenAction = action
 
                 if value < alpha:
-                    print("prune")
                     return [value, chosenAction]
 
                 beta = min(beta, value)
-                print("beta", beta)
 
             return [value, chosenAction]
 
