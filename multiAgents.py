@@ -59,9 +59,8 @@ class ReflexAgent(Agent):
         bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
 
         # save the index with the best score
-        chosenIndex = random.choice(bestIndices) # Pick randomly among the best
+        chosenIndex = random.choice(bestIndices)  # Pick randomly among the best
         # If there are multiple moves with the same best score, randomly pick
-
 
         "Add more of your code here if you want to"
 
@@ -170,6 +169,7 @@ class ReflexAgent(Agent):
                 score = score - 500
 
             return score
+
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -309,6 +309,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
+
         def maximizer(state, agentIndex, depth, alpha, beta):
             value = -float('inf')
             chosenAction = None
@@ -466,10 +467,35 @@ def betterEvaluationFunction(currentGameState):
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
     evaluation function (question 5).
 
-    DESCRIPTION: <write something here so we know what you did>
+    I should evaluate states rather than action. Unlike my reflex agent from Q1
+    returns a score
+    What is the difference between evaluating states vs action?
+    state values are used to score the current state of the game in favor of the
+    player agent. Action scores depend on the current specific situation of the game.
+    How close is the enemy? How close am I to the food? etc.
+
+    pacman again will not move if I am just returning the score, as stopping is a
+    better option than losing points to travel to the next food
+    pacman will move only if there is adjacent food or if ghost is near him
+
+    DESCRIPTION: same as my other eval function!
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    pacmanPosition = currentGameState.getPacmanPosition()
+    ghostState = currentGameState.getGhostStates()
+
+    distanceGhost = min(
+        manhattanDistance(pacmanPosition, ghost.configuration.pos) for ghost in ghostState)
+
+    # Only encourage pacman to be scared of ghost if it's really close
+    if distanceGhost < 3:
+        ghost = -500
+    else:
+        ghost = 100
+
+    score = currentGameState.getScore() * 0.7
+
+    return ghost + score
 
 
 # Abbreviation
